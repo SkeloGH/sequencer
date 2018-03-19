@@ -1,22 +1,11 @@
-body {
-  font: 14px "Century Gothic", Futura, sans-serif;
-  margin: 20px; }
+.stage__main .board__main .square {
+  height: 50px; }
 
-ol, ul {
-  padding-left: 30px; }
+.story__list,
+.story__item {
+  transform: rotateX(180deg); }
 
-.app__wrapper {
-  display: flex; }
-
-.status {
-  margin-bottom: 10px; }
-
-.kbd-navigation .square:focus {
-  background: #ddd; }
-
-.app {
-  display: flex;
-  flex-direction: row; }
-
-.app-info {
-  margin-left: 20px; }
+.story__item {
+  padding: 20px 0; }
+  .story__item:hover {
+    background: rgba(100, 100, 100, 0.2); }
