@@ -1,5 +1,5 @@
 import 'grommet'
-import './../../../node_modules/grommet/scss/vanilla/index.scss';
+import 'grommet/scss/vanilla/index.scss';
 import React from 'react'
 import Header from 'grommet/components/Header'
 
