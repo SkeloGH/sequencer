@@ -1,19 +1,23 @@
+/** Main dependencies */
 import 'grommet'
 import 'grommet/scss/vanilla/index.scss'
 import React from 'react'
-import App from 'grommet/components/App'
-import Split from 'grommet/components/Split'
-import Section from 'grommet/components/Section'
+
+/** UI Framework modules */
+import App     from 'grommet/components/App'
+import Box     from 'grommet/components/Box'
+import Button  from 'grommet/components/Button'
 import Columns from 'grommet/components/Columns'
+import Header  from 'grommet/components/Header'
+import Section from 'grommet/components/Section'
+import Split   from 'grommet/components/Split'
+import Value   from 'grommet/components/Value'
 
-import Header from 'grommet/components/Header'
-import Value from 'grommet/components/Value'
-import Box from 'grommet/components/Box'
-import Button from 'grommet/components/Button'
-
+/** Custom dependencies */
 import './style.scss'
 import Board from '../board/script.js'
 
+/** Component definition */
 export default class Main extends React.Component {
   constructor(props){
     super(props)
@@ -33,7 +37,7 @@ export default class Main extends React.Component {
   }
 
   onSquareClick(sq_idx){
-    const history = this.state.history.slice(0, this.state.step_number + 1)
+    const history = this.state.history.slice()
     const current = history[this.state.step_number]
     const squares = current.squares.slice()
 
@@ -52,32 +56,26 @@ export default class Main extends React.Component {
   }
 
   addStep(){
-    const history = this.state.history.slice(0, this.state.step_number + 1)
-    const current = history[this.state.step_number]
-    const squares = current.squares.slice()
+    const step_number = this.state.step_number;
+    const history = this.state.history.slice()
+    const squares = Array(9).fill(null)
 
     this.setState({
       history: history.concat([{squares:squares}]),
-      step_number: history.length
+      step_number: step_number+1
     })
   }
 
-  render() {
-    const theme = this.theme
+  getMoves(){
     const history = this.state.history
-    const current = history[this.state.step_number]
-    const moves = history.map((step, move)=>{
+    const moves = history.map((step, move) => {
       return (
-        <Columns
-          justify='center'
-          size='small'
-          responsive={false}
-          className="story__item"
-          key={move}
+        <Columns className="story__item" justify='center' size='small'
+          responsive={false} key={move}
           onClick={(e) => this.jumpTo(move, e)}
         >
           <Box align='center' pad='small' margin='small' size="small" >
-            <Value value={move+1} />
+            <Value value={move + 1} />
           </Box>
           <Box>
             <Board squares={step.squares} />
@@ -85,10 +83,17 @@ export default class Main extends React.Component {
         </Columns>
       )
     })
+    return moves
+  }
+
+  render() {
+    const theme = this.theme
+    const history = this.state.history
+    const current = history[this.state.step_number]
+    const moves = this.getMoves()
 
     return (
       <App centered={false}>
-        
         <Split priority="left" fixed={true} showOnResponsive="both">
           <Section
             className="stage__main"
@@ -107,7 +112,7 @@ export default class Main extends React.Component {
           <Section
             className="story__main"
             colorIndex={theme.split_bg_2}
-            full={true}
+            // full={true}
             pad="none"
           >
             <Header colorIndex={theme.bar_bg} fixed={true}
@@ -116,8 +121,7 @@ export default class Main extends React.Component {
             >
               <Button label="Add step" onClick={this.addStep} />
             </Header>
-              <Box className="story__list" pad={{ vertical: 'small' }}>{moves}</Box>
-            
+            <Box className="story__list" pad={{ vertical: 'small' }}>{moves}</Box>
           </Section>
         </Split>
       </App>

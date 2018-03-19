@@ -1,7 +1,8 @@
 .stage__main {
   .board__main {
     .square {
-      height: 50px;
+      height: 3em;
+      line-height: 3em;
     }
   }
 }
@@ -11,6 +12,7 @@
 }
 .story__item {
   padding: 20px 0;
+  min-height: 140px;
   &:hover {
     background: rgba(100, 100, 100, 0.2)
   }
