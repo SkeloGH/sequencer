@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './modules/app/script.js';
+import App from './components/app/script.js';
 
 // ========================================
 
