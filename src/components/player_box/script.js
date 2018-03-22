@@ -11,8 +11,8 @@ import PlayIcon from 'grommet/components/icons/base/Play'
 import PauseIcon from 'grommet/components/icons/base/Pause'
 import FastForwardIcon from 'grommet/components/icons/base/FastForward'
 
-
-export default class PlayerBox extends React.Component {
+/** Component definition */
+export default class PlayerBox extends React.PureComponent {
     constructor(props){
         super(props)
         this.button_size = this.props.buttonSize || "small"
@@ -25,10 +25,10 @@ export default class PlayerBox extends React.Component {
             return <PlayIcon size={size} type="control" onClick={this.props.onPlay} />
         }
     }
-    
+
     render(){
         const button_size = this.button_size
-        
+
         return (
             <Box
                 alignSelf="center"
