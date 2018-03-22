@@ -6,11 +6,17 @@ export default class Board extends React.Component {
   renderSquare(idx) {
     return (<Square
               value={this.props.squares[idx]}
-              onClick={()=>{return this.props.onSquareClick && this.props.onSquareClick(idx)}}
+              onClick={() => {
+                return this.props.onSquareClick && this.props.onSquareClick(idx)}}
             />)
   }
 
+  shouldComponentUpdate(nextProps, nextState){
+    return !this.has_changed
+  }
+
   render() {
+    this.has_changed = false
     return (
       <div className="board__main">
         <div className="board__row">
