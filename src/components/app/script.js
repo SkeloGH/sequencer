@@ -2,26 +2,23 @@
 import 'grommet'
 import 'grommet/scss/vanilla/index.scss'
 import React from 'react'
-
 /** UI Framework modules */
 import App     from 'grommet/components/App'
-import Button  from 'grommet/components/Button'
-import Header  from 'grommet/components/Header'
 import Section from 'grommet/components/Section'
 import Split   from 'grommet/components/Split'
-
 /** Custom dependencies */
 import './style.scss'
 import Board from '../board/script.js'
 import StoryBoard from '../story_board/script.js'
+import StoryHeader from '../story_header/script.js'
 import PlayerBox from '../player_box/script.js'
 
 /** Component definition */
 export default class Main extends React.PureComponent {
   constructor(props){
     super(props)
-    this.timerMs = 500
-    this.theme = {
+    this.timerMs       = 500
+    this.theme         = {
       bar_bg: "neutral-4-a",
       split_bg_1: "neutral-4",
       split_bg_2: "light-2",
@@ -29,13 +26,11 @@ export default class Main extends React.PureComponent {
     this.onStoryClick  = this.onStoryClick.bind(this)
     this.onSquareClick = this.onSquareClick.bind(this)
     this.playbackTimer = null
-    this.resume     = this.resume.bind(this)
-    this.forward    = this.forward.bind(this)
-    this.rewind     = this.rewind.bind(this)
-
-
-    this.addStep = this.addStep.bind(this)
-    this.state   = {
+    this.resume        = this.resume.bind(this)
+    this.forward       = this.forward.bind(this)
+    this.rewind        = this.rewind.bind(this)
+    this.addStep       = this.addStep.bind(this)
+    this.state         = {
       playing: false,
       story: [{
         squares: Array(9).fill(null),
@@ -124,20 +119,18 @@ export default class Main extends React.PureComponent {
     }
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {}
-
-  render() {
-    const theme   = this.theme
-    const story   = this.state.story
+  getAppProps(){
+    const theme = this.theme
+    const story = this.state.story
     const current = story[this.state.step_number]
-    const attrs   = {
+    const attrs = {
       App: {
         centered: false
       },
       Layout: {
-        priority:"left",
-        fixed:true,
-        showOnResponsive:"both",
+        priority: "left",
+        fixed: true,
+        showOnResponsive: "both",
       },
       PreviewSection: {
         className: "stage__main",
@@ -161,11 +154,12 @@ export default class Main extends React.PureComponent {
         onRewind: this.rewind,
       },
       StorySection: {
-        className:"story__main",
+        className: "story__main",
         colorIndex: theme.split_bg_2,
         pad: "none",
       },
       StoryHeader: {
+        static: true,
         container: {
           colorIndex: theme.bar_bg,
           fixed: true,
@@ -178,17 +172,17 @@ export default class Main extends React.PureComponent {
           }
         },
         button: {
-          label:"+ Add step",
+          label: "+ Add step",
           onClick: this.addStep,
         },
       },
       StoryBoard: {
         container: {
-            onClick: this.onStoryClick,
-            className: "story__list",
-            pad: {
-              vertical: 'small'
-            }
+          onClick: this.onStoryClick,
+          className: "story__list",
+          pad: {
+            vertical: 'small'
+          }
         },
         story: {
           items: this.state.story,
@@ -196,6 +190,11 @@ export default class Main extends React.PureComponent {
         }
       }
     }
+    return attrs
+  }
+
+  render() {
+    const attrs   = this.getAppProps()
     /**                   App
      *  +-------------------------------------+
      *  |                Layout               |
@@ -222,20 +221,6 @@ export default class Main extends React.PureComponent {
 
         </Split>
       </App>
-    )
-  }
-}
-
-class StoryHeader extends React.Component {
-  shouldComponentUpdate(nextProps, nextState){
-    return false
-  }
-  render(){
-    const attrs = this.props
-    return (
-      <Header { ...attrs.container }>
-        <Button {...attrs.button} />
-      </Header >
     )
   }
 }
