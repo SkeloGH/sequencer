@@ -1,4 +1,4 @@
-/** Main dependencies */
+/** 3rd-party dependencies */
 import 'grommet'
 import 'grommet/scss/vanilla/index.scss'
 import React from 'react'
@@ -6,30 +6,38 @@ import React from 'react'
 import App     from 'grommet/components/App'
 import Section from 'grommet/components/Section'
 import Split   from 'grommet/components/Split'
-/** Custom dependencies */
+/** Component dependencies */
 import './style.scss'
-import Board from '../board/script.js'
-import StoryBoard from '../story_board/script.js'
-import StoryHeader from '../story_header/script.js'
-import PlayerBox from '../player_box/script.js'
+import APP_DEFAULTS from './defaults.js'
+/** Custom components */
+import Board        from '../board/script.js'
+import StoryBoard   from '../story_board/script.js'
+import StoryHeader  from '../story_header/script.js'
+import PlayerBox    from '../player_box/script.js'
 
 /** Component definition */
 export default class Main extends React.PureComponent {
   constructor(props){
     super(props)
-    this.timerMs       = 500
-    this.theme         = {
-      bar_bg: "neutral-4-a",
-      split_bg_1: "neutral-4",
-      split_bg_2: "light-2",
-    }
-    this.onStoryClick  = this.onStoryClick.bind(this)
-    this.onSquareClick = this.onSquareClick.bind(this)
+    let config         = APP_DEFAULTS
     this.playbackTimer = null
-    this.resume        = this.resume.bind(this)
-    this.forward       = this.forward.bind(this)
-    this.rewind        = this.rewind.bind(this)
+    this.timerMs       = 500
     this.addStep       = this.addStep.bind(this)
+    this.forward       = this.forward.bind(this)
+    this.onSquareClick = this.onSquareClick.bind(this)
+    this.onStoryClick  = this.onStoryClick.bind(this)
+    this.resume        = this.resume.bind(this)
+    this.rewind        = this.rewind.bind(this)
+
+    config.StoryHeader.button.onClick   = this.addStep
+    config.StoryBoard.container.onClick = this.onStoryClick
+    config.PlayerBox.onForward          = this.forward
+    config.PlayerBox.onPause            = this.pause
+    config.PlayerBox.onPlay             = this.resume
+    config.PlayerBox.onRewind           = this.rewind
+    config.PreviewScreen.onSquareClick  = this.onSquareClick
+
+    this.UI_cfg        = config
     this.state         = {
       playing: false,
       story: [{
@@ -119,82 +127,16 @@ export default class Main extends React.PureComponent {
     }
   }
 
-  getAppProps(){
-    const theme = this.theme
-    const story = this.state.story
-    const current = story[this.state.step_number]
-    const attrs = {
-      App: {
-        centered: false
-      },
-      Layout: {
-        priority: "left",
-        fixed: true,
-        showOnResponsive: "both",
-      },
-      PreviewSection: {
-        className: "stage__main",
-        colorIndex: theme.split_bg_1,
-        full: true,
-        pad: {
-          horizontal: 'medium',
-          vertical: 'medium',
-        }
-      },
-      PreviewScreen: {
-        squares: current.squares,
-        onSquareClick: this.onSquareClick
-      },
-      PlayerBox: {
-        buttonSize: "small",
-        playing: this.state.playing,
-        onPlay: this.resume,
-        onPause: this.pause,
-        onForward: this.forward,
-        onRewind: this.rewind,
-      },
-      StorySection: {
-        className: "story__main",
-        colorIndex: theme.split_bg_2,
-        pad: "none",
-      },
-      StoryHeader: {
-        static: true,
-        container: {
-          colorIndex: theme.bar_bg,
-          fixed: true,
-          direction: "row",
-          justify: "between",
-          size: "small",
-          pad: {
-            horizontal: 'medium',
-            vertical: 'medium',
-          }
-        },
-        button: {
-          label: "+ Add step",
-          onClick: this.addStep,
-        },
-      },
-      StoryBoard: {
-        container: {
-          onClick: this.onStoryClick,
-          className: "story__list",
-          pad: {
-            vertical: 'small'
-          }
-        },
-        story: {
-          items: this.state.story,
-          active_num: this.state.step_number
-        }
-      }
-    }
-    return attrs
-  }
-
   render() {
-    const attrs   = this.getAppProps()
+    const story   = this.state.story
+    const current = story[this.state.step_number]
+    const attrs   = this.UI_cfg
+
+    attrs.PreviewScreen.squares       = current.squares
+    attrs.PlayerBox.playing           = this.state.playing
+    attrs.StoryBoard.story.items      = this.state.story
+    attrs.StoryBoard.story.active_num = this.state.step_number
+
     /**                   App
      *  +-------------------------------------+
      *  |                Layout               |
