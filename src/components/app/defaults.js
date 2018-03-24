@@ -1,5 +1,12 @@
 export default
 {
+    tile_fill: '0',
+    tile_empty: '.',
+    KeyMap: [
+        'q', 'w', 'e',
+        'a', 's', 'd',
+        'z', 'x', 'c',
+    ],
     App: {
         centered: false
     },

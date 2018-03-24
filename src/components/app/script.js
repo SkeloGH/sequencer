@@ -26,6 +26,8 @@ export default class Main extends React.PureComponent {
     this.forward       = this.forward.bind(this)
     this.onSquareClick = this.onSquareClick.bind(this)
     this.onStoryClick  = this.onStoryClick.bind(this)
+    this.onKeyDown     = this.onKeyDown.bind(this)
+    this.onKeyUp       = this.onKeyUp.bind(this)
     this.resume        = this.resume.bind(this)
     this.rewind        = this.rewind.bind(this)
 
@@ -39,20 +41,52 @@ export default class Main extends React.PureComponent {
 
     this.UI_cfg        = config
     this.state         = {
+      step_number: 0,
       playing: false,
+      active_keys: Array(9).fill(this.UI_cfg.tile_empty),
       story: [{
-        squares: Array(9).fill(null),
+        squares: Array(9).fill(this.UI_cfg.tile_empty),
       }],
-      step_number: 0
     }
   }
 
+  /*
+   * Class utility methods
+  */
+  getCurrentSquares() {
+    const story = this.state.story.slice()
+    const current = story[this.state.step_number]
+    const squares = current.squares.slice()
+    return squares
+  }
+
+  setActiveKeyState(key_code, value) {
+    const key_map = this.UI_cfg.KeyMap.slice()
+    const new_map = this.state.active_keys.slice()
+    const key_index = key_map.indexOf(key_code)
+
+    if (key_index > -1) {
+      new_map[key_index] = value
+    }
+
+    this.setState({
+      active_keys: new_map
+    })
+  }
+
+  /*
+   * Event listeners
+  */
   onSquareClick(sq_idx){
     const story   = this.state.story.slice()
     const current = story[this.state.step_number]
     const squares = current.squares.slice()
 
-    squares[sq_idx] = squares[sq_idx] ? '':'O'
+    if (squares[sq_idx] === this.UI_cfg.tile_fill){
+      squares[sq_idx] = this.UI_cfg.tile_empty
+    }else{
+      squares[sq_idx] = this.UI_cfg.tile_fill
+    }
     current.squares = squares
 
     this.setState({
@@ -60,19 +94,59 @@ export default class Main extends React.PureComponent {
     })
   }
 
-  resume(){
-    let playing = false
-    let next    = this.state.step_number
-    if (this.state.step_number < this.state.story.length - 1) {
-      playing = true
-      next    = this.state.step_number + 1
-      this.jumpTo(next)
-      this.playbackTimer = setTimeout(this.resume, this.timerMs);
+  onStoryClick(event) {
+    const elem = event.target
+    let target_step = null
+
+    if (elem.classList.contains('story__item')) {
+      target_step = elem.getAttribute('index_name')
+
+      if (target_step) {
+        this.jumpTo(parseInt(target_step, 10))
+      }
+    } else {
+      this.onStoryClick({ target: elem.offsetParent })
     }
+  }
+
+  onKeyDown(e) {
+    this.setActiveKeyState(e.key, this.UI_cfg.tile_fill)
+  }
+
+  onKeyUp(e) {
+    const squares = this.getCurrentSquares()
+    const new_map = this.state.active_keys.slice()
+    const squares_str = squares.join('')
+    const key_map_str = new_map.join('')
+
+    if (squares_str === key_map_str) {
+      this.next()
+    }
+    this.setActiveKeyState(e.key, this.UI_cfg.tile_empty)
+  }
+  /*
+   * UI methods
+  */
+  resume(){
+    let playing = this.next((idx) => {
+      this.playbackTimer = setTimeout(this.resume, this.timerMs);
+    })
 
     this.setState({
       playing: playing
     })
+  }
+
+  next(cb){
+    let has_next = this.state.step_number < this.state.story.length - 1
+
+    if (has_next) {
+      this.jumpTo(this.state.step_number + 1)
+      if (typeof cb === "function") {
+        cb(this.state.step_number + 1)
+      }
+    }
+    return has_next
   }
 
   pause(){
@@ -104,27 +178,19 @@ export default class Main extends React.PureComponent {
   addStep(){
     const step_number = this.state.step_number;
     const story       = this.state.story.slice()
-    const squares     = Array(9).fill(null)
+    const squares     = Array(9).fill(this.UI_cfg.tile_empty)
 
     this.setState({
       story: story.concat([{squares:squares}]),
       step_number: step_number+1
     })
   }
-
-  onStoryClick(event){
-    const elem = event.target
-    let target_step = null
-
-    if (elem.classList.contains('story__item')){
-      target_step = elem.getAttribute('index_name')
-
-      if (target_step) {
-        this.jumpTo(parseInt(target_step, 10))
-      }
-    }else{
-      this.onStoryClick({target: elem.offsetParent})
-    }
+  /*
+   * Component methods
+  */
+  componentDidMount() {
+    window.addEventListener('keydown', this.onKeyDown)
+    window.addEventListener('keyup', this.onKeyUp)
   }
 
   render() {
